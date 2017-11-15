@@ -149,13 +149,6 @@ libraries.plist = 'com.googlecode.plist:dd-plist:1.20'
 allprojects { currentProject ->
     dependencies {
         components {
-            withModule('org.apache.ivy:ivy') {
-                withVariant('default') {
-                    withDependencies {
-                        add('com.jcraft:jsch:0.1.54') //is declared, but optional
-                    }
-                }
-            }
             withModule('org.apache.maven:maven-core') {
                 withVariant('default') {
                     withDependencies {
