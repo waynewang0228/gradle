@@ -24,6 +24,7 @@ versions.commons_io = '2.2'
 versions.groovy = '2.4.12'
 versions.bouncycastle = '1.58'
 versions.maven = '3.0.4'
+versions.slf4j = '1.7.16'
 
 libraries.ant = 'org.apache.ant:ant:1.9.9'
 libraries.asm =  'org.ow2.asm:asm-debug-all:6.0_ALPHA'
@@ -42,10 +43,10 @@ libraries.jcip = "net.jcip:jcip-annotations:1.0"
 libraries.inject = 'javax.inject:javax.inject:1'
 
 // Logging
-libraries.slf4j_api = 'org.slf4j:slf4j-api:1.7.10'
-libraries.jcl_to_slf4j = 'org.slf4j:jcl-over-slf4j:1.7.10'
-libraries.jul_to_slf4j = 'org.slf4j:jul-to-slf4j:1.7.10'
-libraries.log4j_to_slf4j = 'org.slf4j:log4j-over-slf4j:1.7.10'
+libraries.slf4j_api = "org.slf4j:slf4j-api:${versions.slf4j}"
+libraries.jcl_to_slf4j = "org.slf4j:jcl-over-slf4j:${versions.slf4j}"
+libraries.jul_to_slf4j = "org.slf4j:jul-to-slf4j:${versions.slf4j}"
+libraries.log4j_to_slf4j = "org.slf4j:log4j-over-slf4j:${versions.slf4j}"
 libraries.logback_core = 'ch.qos.logback:logback-core:1.0.13'
 libraries.logback_classic = 'ch.qos.logback:logback-classic:1.0.13'
 
@@ -53,7 +54,7 @@ libraries.logback_classic = 'ch.qos.logback:logback-classic:1.0.13'
 libraries.servlet_api = "org.mortbay.jetty:servlet-api:2.5-20081211"
 libraries.jetty_util = "org.mortbay.jetty:jetty-util:6.1.26"
 libraries.jetty = "org.mortbay.jetty:jetty:6.1.26"
-libraries.commons_codec = "commons-codec:commons-codec:1.6"
+libraries.commons_codec = "commons-codec:commons-codec:1.9"
 libraries.jcifs = "org.samba.jcifs:jcifs:1.3.17"
 libraries.commons_httpclient = 'org.apache.httpcomponents:httpclient:4.5.3'
 
@@ -173,14 +174,6 @@ allprojects { currentProject ->
                     withDependencies { it.removeAll { it.group == 'org.sonatype.sisu' }}
                 }
             }
-            withModule('org.apache.maven.wagon:wagon-provider-api') {
-                withVariant('default') {
-                    withDependencies { it.findAll { it.name == 'plexus-utils' }.each { it.version = '2.1' }}
-                }
-                withVariant('runtime') {
-                    withDependencies { it.findAll { it.name == 'plexus-utils' }.each { it.version = '2.1' }}
-                }
-            }
             withModule('org.apache.xbean:xbean-reflect') {
                 withVariant('default') {
                     withDependencies { it.removeAll { it.group == 'commons-logging' || it.group == 'log4j' }}
@@ -234,15 +227,6 @@ allprojects { currentProject ->
                     withDependencies { it.removeAll { it.group == 'org.jsoup' || it.group == 'commons-logging' || it.group == 'org.apache.httpcomponents' }}
                 }
             }
-            withModule('net.sourceforge.nekohtml:nekohtml') {
-                withVariant('default') {
-                    withDependencies {
-                        it.findAll { it.group == 'xerces' }.each {
-                            it.version = '2.11.0'
-                        }
-                    }
-                }
-            }
             withModule('org.eclipse.jgit:org.eclipse.jgit') {
                 withVariant('default') {
                     withDependencies { it.removeAll { it.group == 'com.googlecode.javaewah' }}
@@ -269,35 +253,7 @@ allprojects { currentProject ->
             withModule('org.apache.sshd:sshd-core') {
                 withVariant('default') {
                     withDependencies {
-                        it.findAll { it.group == 'org.slf4j' }.each {
-                            it.version = '1.7.10'
-                        }
                         add('org.apache.mina:mina-core:2.0.10') //is declared, but optional
-                    }
-                }
-            }
-            withModule('org.apache.mina:mina-core') {
-                withVariant('default') {
-                    withDependencies {
-                        it.findAll { it.group == 'org.slf4j' }.each {
-                            it.version = '1.7.10'
-                        }
-                    }
-                }
-                withVariant('runtime') {
-                    withDependencies {
-                        it.findAll { it.group == 'org.slf4j' }.each {
-                            it.version = '1.7.10'
-                        }
-                    }
-                }
-            }
-            withModule('org.spockframework:spock-core') {
-                withVariant('default') {
-                    withDependencies {
-                        it.findAll { it.group == 'org.objenesis' }.each {
-                            it.version = '1.2'
-                        }
                     }
                 }
             }
@@ -320,16 +276,12 @@ allprojects { currentProject ->
                         withDependencies {
                             it.removeAll { it.group == 'commons-logging' }
                             add(libraries.jcl_to_slf4j)
-                            it.findAll { it.group == 'commons-codec' }.each { it.version = '1.6' }
-                            it.findAll { it.name == 'httpcore' }.each { it.version = '4.4.8' }
                             add(libraries.jcifs)
                         }
                     }
                     withVariant('runtime') {
                         withDependencies {
                             it.removeAll { it.group == 'commons-logging' }
-                            it.findAll { it.group == 'commons-codec' }.each { it.version = '1.6' }
-                            it.findAll { it.name == 'httpcore' }.each { it.version = '4.4.8' }
                         }
                     }
                 }
