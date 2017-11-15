@@ -20,18 +20,18 @@ ext {
 }
 
 versions.gradle_kotlin_dsl = '0.12.3'
-versions.commons_io = '2.2'
 versions.groovy = '2.4.12'
 versions.bouncycastle = '1.58'
 versions.maven = '3.0.4'
 versions.slf4j = '1.7.16'
 
 libraries.ant = 'org.apache.ant:ant:1.9.9'
+libraries.antlr = 'antlr:antlr:2.7.7'
 libraries.asm =  'org.ow2.asm:asm-debug-all:6.0_ALPHA'
 libraries.cglib = 'cglib:cglib:3.2.5'
 libraries.bndlib = 'biz.aQute.bnd:biz.aQute.bndlib:3.4.0'
 libraries.commons_cli = 'commons-cli:commons-cli:1.2'
-libraries.commons_io = "commons-io:commons-io:${versions.commons_io}"
+libraries.commons_io = 'commons-io:commons-io:2.4'
 libraries.commons_lang = 'commons-lang:commons-lang:2.6'
 libraries.commons_collections = 'commons-collections:commons-collections:3.2.2'
 libraries.commons_compress = 'org.apache.commons:commons-compress:1.14'
@@ -261,6 +261,11 @@ allprojects { currentProject ->
             withModule('jaxen:jaxen') {
                 withVariant('default') {
                     withDependencies { it.removeAll { true } }
+                }
+            }
+            withModule('org.littleshoot:littleproxy') {
+                withVariant('default') {
+                    withDependencies { it.removeAll { it.group == 'com.barchart.udt' || it.group == 'com.google.guava' || it.group == 'commons-cli' }}
                 }
             }
             if (currentProject.name != 'internalAndroidPerformanceTesting') {

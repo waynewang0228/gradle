@@ -67,10 +67,8 @@ dependencies {
     asciidoctor 'org.asciidoctor:asciidoctorj:1.5.6'
 
     userGuideTask 'xalan:xalan:2.7.1', libraries.xerces
-    userGuideTask module('xhtmlrenderer:xhtmlrenderer:R8rc1') {
-        dependency 'itext:itext:2.0.8@jar'
-    }
-    userGuideTask 'xslthl:xslthl:2.0.1@jar'
+    userGuideTask 'xhtmlrenderer:xhtmlrenderer:R8rc1'
+    userGuideTask 'xslthl:xslthl:2.0.1'
 
     userGuideStyleSheets 'docbook:docbook-xsl:1.75.2@zip'
     jquery "jquery:jquery.min:1.8.0@js"
