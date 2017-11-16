@@ -120,6 +120,7 @@ public class ModuleMetadataSerializer {
                 encoder.writeString(variant.getName());
                 writeAttributes(variant.getAttributes());
                 writeVariantDependencies(variant.getDependencies());
+                writeVariantDependencyConstraints(variant.getDependencyConstraints());
                 writeVariantFiles(variant.getFiles());
             }
         }
@@ -128,6 +129,13 @@ public class ModuleMetadataSerializer {
             encoder.writeSmallInt(dependencies.size());
             for (ComponentVariant.Dependency dependency : dependencies) {
                 COMPONENT_SELECTOR_SERIALIZER.write(encoder, dependency.getGroup(), dependency.getModule(), dependency.getVersionConstraint());
+            }
+        }
+
+        private void writeVariantDependencyConstraints(List<? extends ComponentVariant.DependencyConstraint> dependencyConstraints) throws IOException {
+            encoder.writeSmallInt(dependencyConstraints.size());
+            for (ComponentVariant.DependencyConstraint dependencyConstraint : dependencyConstraints) {
+                COMPONENT_SELECTOR_SERIALIZER.write(encoder, dependencyConstraint.getGroup(), dependencyConstraint.getModule(), dependencyConstraint.getVersionConstraint());
             }
         }
 
@@ -365,6 +373,7 @@ public class ModuleMetadataSerializer {
                 ImmutableAttributes attributes = readAttributes();
                 MutableComponentVariant variant = metadata.addVariant(name, attributes);
                 readVariantDependencies(variant);
+                readVariantDependencyConstraint(variant);
                 readVariantFiles(variant);
             }
         }
@@ -390,6 +399,14 @@ public class ModuleMetadataSerializer {
             for (int i = 0; i < count; i++) {
                 ModuleComponentSelector selector = COMPONENT_SELECTOR_SERIALIZER.read(decoder);
                 variant.addDependency(selector.getGroup(), selector.getModule(), selector.getVersionConstraint());
+            }
+        }
+
+        private void readVariantDependencyConstraint(MutableComponentVariant variant) throws IOException {
+            int count = decoder.readSmallInt();
+            for (int i = 0; i < count; i++) {
+                ModuleComponentSelector selector = COMPONENT_SELECTOR_SERIALIZER.read(decoder);
+                variant.addDependencyConstraint(selector.getGroup(), selector.getModule(), selector.getVersionConstraint());
             }
         }
 

@@ -221,7 +221,7 @@ public class DefaultMutableMavenModuleResolveMetadata extends AbstractMutableMod
             builder.addAll(variants);
         }
         for (MutableVariantImpl variant : newVariants) {
-            builder.add(new ImmutableVariantImpl(getComponentId(), variant.name, variant.attributes, ImmutableList.copyOf(variant.dependencies), ImmutableList.copyOf(variant.files)));
+            builder.add(new ImmutableVariantImpl(getComponentId(), variant.name, variant.attributes, ImmutableList.copyOf(variant.dependencies), ImmutableList.copyOf(variant.dependencyConstraints), ImmutableList.copyOf(variant.files)));
         }
         return builder.build();
     }
@@ -230,6 +230,7 @@ public class DefaultMutableMavenModuleResolveMetadata extends AbstractMutableMod
         private final String name;
         private final ImmutableAttributes attributes;
         private final List<DependencyImpl> dependencies = new ArrayList<DependencyImpl>();
+        private final List<DependencyConstraintImpl> dependencyConstraints = new ArrayList<DependencyConstraintImpl>();
         private final List<FileImpl> files = new ArrayList<FileImpl>();
 
         MutableVariantImpl(String name, ImmutableAttributes attributes) {
@@ -240,6 +241,11 @@ public class DefaultMutableMavenModuleResolveMetadata extends AbstractMutableMod
         @Override
         public void addDependency(String group, String module, VersionConstraint versionConstraint) {
             dependencies.add(new DependencyImpl(group, module, versionConstraint));
+        }
+
+        @Override
+        public void addDependencyConstraint(String group, String module, VersionConstraint versionConstraint) {
+            dependencyConstraints.add(new DependencyConstraintImpl(group, module, versionConstraint));
         }
 
         @Override
@@ -295,18 +301,48 @@ public class DefaultMutableMavenModuleResolveMetadata extends AbstractMutableMod
         }
     }
 
+
+    private static class DependencyConstraintImpl implements ComponentVariant.DependencyConstraint {
+        private final String group;
+        private final String module;
+        private final VersionConstraint versionConstraint;
+
+        DependencyConstraintImpl(String group, String module, VersionConstraint versionConstraint) {
+            this.group = group;
+            this.module = module;
+            this.versionConstraint = versionConstraint;
+        }
+
+        @Override
+        public String getGroup() {
+            return group;
+        }
+
+        @Override
+        public String getModule() {
+            return module;
+        }
+
+        @Override
+        public VersionConstraint getVersionConstraint() {
+            return versionConstraint;
+        }
+    }
+
     private static class ImmutableVariantImpl implements ComponentVariant, VariantMetadata {
         private final ModuleComponentIdentifier componentId;
         private final String name;
         private final ImmutableAttributes attributes;
         private final ImmutableList<DependencyImpl> dependencies;
         private final ImmutableList<FileImpl> files;
+        private final ImmutableList<DependencyConstraintImpl> dependencyConstraints;
 
-        ImmutableVariantImpl(ModuleComponentIdentifier componentId, String name, ImmutableAttributes attributes, ImmutableList<DependencyImpl> dependencies, ImmutableList<FileImpl> files) {
+        ImmutableVariantImpl(ModuleComponentIdentifier componentId, String name, ImmutableAttributes attributes, ImmutableList<DependencyImpl> dependencies,  ImmutableList<DependencyConstraintImpl> dependencyConstraints, ImmutableList<FileImpl> files) {
             this.componentId = componentId;
             this.name = name;
             this.attributes = attributes;
             this.dependencies = dependencies;
+            this.dependencyConstraints = dependencyConstraints;
             this.files = files;
         }
 
@@ -328,6 +364,11 @@ public class DefaultMutableMavenModuleResolveMetadata extends AbstractMutableMod
         @Override
         public ImmutableList<? extends Dependency> getDependencies() {
             return dependencies;
+        }
+
+        @Override
+        public ImmutableList<? extends DependencyConstraint> getDependencyConstraints() {
+            return dependencyConstraints;
         }
 
         @Override

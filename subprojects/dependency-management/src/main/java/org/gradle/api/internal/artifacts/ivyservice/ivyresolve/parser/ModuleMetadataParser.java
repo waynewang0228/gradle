@@ -108,6 +108,7 @@ public class ModuleMetadataParser {
         ImmutableAttributes attributes = ImmutableAttributes.EMPTY;
         List<ModuleFile> files = Collections.emptyList();
         List<ModuleDependency> dependencies = Collections.emptyList();
+        List<ModuleDependencyConstraint> dependencyConstraints = Collections.emptyList();
         while (reader.peek() != END_OBJECT) {
             String name = reader.nextName();
             if (name.equals("name")) {
@@ -118,6 +119,8 @@ public class ModuleMetadataParser {
                 files = consumeFiles(reader);
             } else if (name.equals("dependencies")) {
                 dependencies = consumeDependencies(reader);
+            } else if (name.equals("dependencyConstraints")) {
+                dependencyConstraints = consumeDependencyConstraints(reader);
             } else if (name.equals("available-at")) {
                 // For now just collect this as another dependency
                 // TODO - collect this information and merge the metadata from the other module
@@ -134,6 +137,9 @@ public class ModuleMetadataParser {
         }
         for (ModuleDependency dependency : dependencies) {
             variant.addDependency(dependency.group, dependency.module, dependency.versionConstraint);
+        }
+        for (ModuleDependencyConstraint dependencyConstraint : dependencyConstraints) {
+            variant.addDependencyConstraint(dependencyConstraint.group, dependencyConstraint.module, dependencyConstraint.versionConstraint);
         }
     }
 
@@ -179,6 +185,33 @@ public class ModuleMetadataParser {
                 }
             }
             dependencies.add(new ModuleDependency(group, module, version));
+            reader.endObject();
+        }
+        reader.endArray();
+        return dependencies;
+    }
+
+    private List<ModuleDependencyConstraint> consumeDependencyConstraints(JsonReader reader) throws IOException {
+        List<ModuleDependencyConstraint> dependencies = new ArrayList<ModuleDependencyConstraint>();
+        reader.beginArray();
+        while (reader.peek() != END_ARRAY) {
+            reader.beginObject();
+            String group = null;
+            String module = null;
+            VersionConstraint version = null;
+            while (reader.peek() != END_OBJECT) {
+                String name = reader.nextName();
+                if (name.equals("group")) {
+                    group = reader.nextString();
+                } else if (name.equals("module")) {
+                    module = reader.nextString();
+                } else if (name.equals("version")) {
+                    version = consumeVersion(reader);
+                } else {
+                    consumeAny(reader);
+                }
+            }
+            dependencies.add(new ModuleDependencyConstraint(group, module, version));
             reader.endObject();
         }
         reader.endArray();
@@ -269,6 +302,18 @@ public class ModuleMetadataParser {
         final VersionConstraint versionConstraint;
 
         ModuleDependency(String group, String module, VersionConstraint versionConstraint) {
+            this.group = group;
+            this.module = module;
+            this.versionConstraint = versionConstraint;
+        }
+    }
+
+    private static class ModuleDependencyConstraint {
+        final String group;
+        final String module;
+        final VersionConstraint versionConstraint;
+
+        ModuleDependencyConstraint(String group, String module, VersionConstraint versionConstraint) {
             this.group = group;
             this.module = module;
             this.versionConstraint = versionConstraint;
