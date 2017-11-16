@@ -149,6 +149,17 @@ libraries.plist = 'com.googlecode.plist:dd-plist:1.20'
 allprojects { currentProject ->
     dependencies {
         components {
+            withModule('org.spockframework:spock-core') {
+                withVariant('default') {
+                    withDependencies {
+                        // 'org.objenesis:objenesis:1.2' is part of Gradle's runtime classpath (via libraries.kryo)
+                        it.findAll { it.group == 'org.objenesis' }.each { it.version = '1.2' }
+                        // Once we have these features:
+                        // - Add a version constraint to model this: constraints { compile('org.objenesis:objenesis') { version { strictly '1.2' } }}
+                        // - Express that '1.2' is the minimum compatible version which can be picked (instead of always reducing it to 1.2)
+                    }
+                }
+            }
             withModule('org.apache.maven:maven-core') {
                 withVariant('default') {
                     withDependencies {
