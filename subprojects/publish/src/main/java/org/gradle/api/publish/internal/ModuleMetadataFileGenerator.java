@@ -310,9 +310,24 @@ public class ModuleMetadataFileGenerator {
         jsonWriter.name("dependencies");
         jsonWriter.beginArray();
         for (ModuleDependency moduleDependency : variant.getDependencies()) {
-            writeDependency(moduleDependency, jsonWriter);
+            if (!isConstraint(moduleDependency)) {
+                writeDependency(moduleDependency, jsonWriter);
+            }
         }
         jsonWriter.endArray();
+
+        jsonWriter.name("dependencyConstraints");
+        jsonWriter.beginArray();
+        for (ModuleDependency moduleDependency : variant.getDependencies()) {
+            if (isConstraint(moduleDependency)) {
+                writeDependency(moduleDependency, jsonWriter);
+            }
+        }
+        jsonWriter.endArray();
+    }
+
+    private boolean isConstraint(ModuleDependency moduleDependency) {
+        return moduleDependency instanceof ExternalDependency && ((ExternalDependency) moduleDependency).isConstraint();
     }
 
     private void writeDependency(ModuleDependency moduleDependency, JsonWriter jsonWriter) throws IOException {
