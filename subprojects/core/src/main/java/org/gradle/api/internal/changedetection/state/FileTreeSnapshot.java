@@ -16,6 +16,8 @@
 
 package org.gradle.api.internal.changedetection.state;
 
+import org.gradle.api.tasks.util.PatternSet;
+
 import java.util.Collection;
 
 /**
@@ -31,4 +33,9 @@ public interface FileTreeSnapshot {
      * The descendants of the root directory, if any. Includes direct and indirect children. Does not include the root directory.
      */
     Collection<FileSnapshot> getDescendants();
+
+    /**
+     * Creates a filtered view of this snapshot that matches the given patterns.
+     */
+    FileTreeSnapshot filter(PatternSet patternSet);
 }
