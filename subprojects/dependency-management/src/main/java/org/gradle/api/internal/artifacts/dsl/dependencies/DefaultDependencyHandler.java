@@ -23,6 +23,7 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.dsl.ComponentMetadataHandler;
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler;
+import org.gradle.api.artifacts.dsl.DependencyConstraintHandler;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
 import org.gradle.api.artifacts.transform.VariantTransform;
@@ -46,6 +47,7 @@ public class DefaultDependencyHandler implements DependencyHandler, MethodMixIn 
     private final ConfigurationContainer configurationContainer;
     private final DependencyFactory dependencyFactory;
     private final ProjectFinder projectFinder;
+    private final DependencyConstraintHandler dependencyConstraintHandler;
     private final ComponentMetadataHandler componentMetadataHandler;
     private final ComponentModuleMetadataHandler componentModuleMetadataHandler;
     private final ArtifactResolutionQueryFactory resolutionQueryFactory;
@@ -57,6 +59,7 @@ public class DefaultDependencyHandler implements DependencyHandler, MethodMixIn 
     public DefaultDependencyHandler(ConfigurationContainer configurationContainer,
                                     DependencyFactory dependencyFactory,
                                     ProjectFinder projectFinder,
+                                    DependencyConstraintHandler dependencyConstraintHandler,
                                     ComponentMetadataHandler componentMetadataHandler,
                                     ComponentModuleMetadataHandler componentModuleMetadataHandler,
                                     ArtifactResolutionQueryFactory resolutionQueryFactory,
@@ -66,6 +69,7 @@ public class DefaultDependencyHandler implements DependencyHandler, MethodMixIn 
         this.configurationContainer = configurationContainer;
         this.dependencyFactory = dependencyFactory;
         this.projectFinder = projectFinder;
+        this.dependencyConstraintHandler = dependencyConstraintHandler;
         this.componentMetadataHandler = componentMetadataHandler;
         this.componentModuleMetadataHandler = componentModuleMetadataHandler;
         this.resolutionQueryFactory = resolutionQueryFactory;
@@ -145,6 +149,11 @@ public class DefaultDependencyHandler implements DependencyHandler, MethodMixIn 
     @Override
     public MethodAccess getAdditionalMethods() {
         return dynamicMethods;
+    }
+
+    @Override
+    public void constraints(Action<? super DependencyConstraintHandler> configureAction) {
+        configureAction.execute(dependencyConstraintHandler);
     }
 
     public void components(Action<? super ComponentMetadataHandler> configureAction) {
