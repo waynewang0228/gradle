@@ -177,7 +177,7 @@ class DefaultFileSystemSnapshotterTest extends Specification {
         def snapshot = snapshotter.snapshotDirectoryTree(filteredTree)
 
         then: "The filtered tree uses the cached state"
-        snapshot.descendants.size() == 3
+        snapshot.descendants*.relativePath*.pathString == ["d1", "d1/f1", "f1"]
     }
 
     def "snapshots a file and caches the result"() {
